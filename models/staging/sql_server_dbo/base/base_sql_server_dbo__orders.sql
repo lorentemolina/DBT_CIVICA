@@ -18,11 +18,11 @@ renamed AS (
 
     SELECT
         order_id,
-        COALESCE(shipping_service,'No_shipping_service') AS shipping_service,
+        COALESCE( NULLIF(shipping_service, '') ,'No_shipping_service') AS shipping_service,
         shipping_cost AS dollars_shipping_cost,
         address_id,
         created_at,
-        MD5(LOWER(REPLACE(REPLACE(promo_id, ' ', '_'), '-', '_'))) AS promo_id,
+        MD5(TRIM(COALESCE(NULLIF(LOWER(REPLACE(REPLACE(promo_id, ' ', ''), '-', '')),''), 'No_promo'))) AS promo_id,
         estimated_delivery_at,
         order_cost AS dollars_order_cost,
         user_id,

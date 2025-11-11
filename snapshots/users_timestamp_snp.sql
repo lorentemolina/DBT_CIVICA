@@ -17,3 +17,4 @@ SELECT
 FROM {{ source('google_sheets', 'users') }}
 
 {% endsnapshot %}
+

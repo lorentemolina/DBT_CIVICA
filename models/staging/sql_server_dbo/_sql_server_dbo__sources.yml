@@ -1,0 +1,154 @@
+version: 2
+
+sources:
+  - name: SQL_SERVER_DBO
+    schema: SQL_SERVER_DBO
+    database: ALUMNO28_DEV_BRONZE_DB
+
+    quoting:
+      database: false
+      schema: false
+      identifier: false
+
+    freshness:
+      warn_after: {count: 365, period: day}
+      error_after: {count: 760, period: day}
+
+    tables:
+
+      - name: ADDRESSES
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: ADDRESS_ID
+            data_tests:
+              - not_null
+              - unique
+          - name: ZIPCODE
+            data_tests:
+              - not_null
+          - name: COUNTRY
+            data_tests:
+              - not_null
+          - name: STATE
+          - name: _FIVETRAN_DELETED
+          - name: _FIVETRAN_SYNCED
+
+      - name: EVENTS
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: EVENT_ID
+            data_tests:
+              - not_null
+              - unique
+          - name: USER_ID
+            data_tests:
+              - relationships:
+                  to: source('SQL_SERVER_DBO', 'USERS')
+                  field: USER_ID
+          - name: PRODUCT_ID
+            data_tests:
+              - relationships:
+                  to: source('SQL_SERVER_DBO', 'PRODUCTS')
+                  field: PRODUCT_ID
+          - name: ORDER_ID
+            data_tests:
+              - relationships:
+                  to: source('SQL_SERVER_DBO', 'ORDERS')
+                  field: ORDER_ID
+          - name: EVENT_TYPE
+            data_tests:
+              - not_null
+
+      - name: PRODUCTS
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: PRODUCT_ID
+            data_tests:
+              - not_null
+              - unique
+          - name: PRICE
+            data_tests:
+              - not_null
+              - positive_values
+          - name: NAME
+            data_tests:
+              - not_null
+          - name: INVENTORY
+            data_tests:
+              - not_null
+
+      - name: ORDERS
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: ORDER_ID
+            data_tests:
+              - not_null
+              - unique
+          - name: USER_ID
+            data_tests:
+              - relationships:
+                  to: source('SQL_SERVER_DBO', 'USERS')
+                  field: USER_ID
+          - name: ADDRESS_ID
+            data_tests:
+              - relationships:
+                  to: source('SQL_SERVER_DBO', 'ADDRESSES')
+                  field: ADDRESS_ID
+          - name: PROMO_ID
+            data_tests:
+              - relationships:
+                  to: source('SQL_SERVER_DBO', 'PROMOS')
+                  field: PROMO_ID
+          - name: STATUS
+            data_tests:
+              - not_null
+
+      - name: ORDER_ITEMS
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: ORDER_ID
+            data_tests:
+              - relationships:
+                  to: source('SQL_SERVER_DBO', 'ORDERS')
+                  field: ORDER_ID
+          - name: PRODUCT_ID
+            data_tests:
+              - relationships:
+                  to: source('SQL_SERVER_DBO', 'PRODUCTS')
+                  field: PRODUCT_ID
+          - name: QUANTITY
+            data_tests:
+              - not_null
+              - positive_values
+
+      - name: PROMOS
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: PROMO_ID
+            data_tests:
+              - not_null
+              - unique
+          - name: DISCOUNT
+            data_tests:
+              - not_null
+          - name: STATUS
+            data_tests:
+              - accepted_values:
+                  values: ['active', 'inactive']
+
+      - name: USERS
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: USER_ID
+            data_tests:
+              - not_null
+              - unique
+          - name: EMAIL
+            data_tests:
+              - not_null
+              - unique
+          - name: ADDRESS_ID
+            data_tests:
+              - relationships:
+                  to: source('SQL_SERVER_DBO', 'ADDRESSES')
+                  field: ADDRESS_ID

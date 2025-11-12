@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: SQL_SERVER_DBO
     schema: SQL_SERVER_DBO
-    database: ALUMNO28_DEV_BRONZE_DB
+    database: "{{ env_var('DBT_ENVIRONMENTS') }}_BRONZE_DB"
 
     quoting:
       database: false
